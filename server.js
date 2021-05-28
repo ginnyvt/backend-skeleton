@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+
+const userRoute = require('./routes/user.routes');
 require('dotenv').config();
 
 const app = express();
@@ -23,11 +25,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // routes
-app.get('/', (req, res) => {
-  res.json({
-    time: Date().toString(),
-  });
-});
+app.use('/api/users', userRoute);
 
 mongoose
   .connect(process.env.MONGO_URL, {
