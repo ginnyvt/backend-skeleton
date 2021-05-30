@@ -13,12 +13,21 @@ const signin = async (req, res) => {
     }
 
     if (!user.authenticate(req.body.password)) {
-      return res.status(401).json({ error: "Email and password don't match" });
+      return res.status(401).json({ error: "Email and password don't match!" });
     }
 
-    const token = jwt.sign({ sub: user._id, iat: new Date() }, jwtSecret, {
-      expiresIn: '1h',
-    });
+    // const token = jwt.sign({ sub: user._id, iat: new Date() }, jwtSecret, {
+    //   expiresIn: '1h',
+    // });
+
+    const token = jwt.sign(
+      { sub: user._id, iat: new Date() * 1000 },
+      jwtSecret,
+      {
+        algorithm: 'HS256',
+        // expiresIn: '1h',
+      }
+    );
 
     return res.status(200).json({
       token: token,
@@ -29,22 +38,23 @@ const signin = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(401).json({ error: 'Could not sign in' });
+    return res.status(401).json({ error: 'Could not sign in!' });
   }
 };
 
 const requireSignin = expressJwt({
   secret: jwtSecret,
-  algorithms: ['RS256'],
+  algorithms: ['HS256', 'RS256'],
   userProperty: 'auth',
 });
 
 const hasAuthorization = (req, res, next) => {
   const authorized =
-    req.profile && req.auth && req.profile._id === req.auth._id;
+    req.profile && req.auth && req.profile._id.toString() === req.auth.sub;
+
   if (!authorized) {
     return res.status(403).json({
-      error: 'User is not authorized',
+      error: 'User is not authorized!',
     });
   }
 

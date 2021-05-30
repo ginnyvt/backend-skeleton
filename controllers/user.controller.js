@@ -61,9 +61,10 @@ const read = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const user = req.profile;
+    let user = req.profile;
     user = extend(user, req.body);
     user.updatedAt = Date.now();
+
     await user.save();
     user.hashed_password = undefined;
     user.salt = undefined;
